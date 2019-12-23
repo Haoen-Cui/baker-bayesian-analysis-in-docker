@@ -37,3 +37,16 @@ vignettes/*.pdf
 
 # R Environment Variables
 .Renviron
+
+# ignore everything in the example website but a few files
+examples/*
+!examples/*.yml
+!examples/*.md
+!examples/*.Rmd
+!examples/*.R
+!examples/*.ipynb
+!examples/*.Rproj
+!examples/layouts/
+examples/py*.md
+examples/py*.Rmd
+examples/index.*

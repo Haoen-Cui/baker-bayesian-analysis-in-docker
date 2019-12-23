@@ -1,0 +1,65 @@
+---
+title: 'Stan in R'
+date: 'Rendered: `r format(Sys.time(), "%b %d, %Y")`'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Stan 
+
+This is an example of running [`rstan`](https://cran.r-project.org/web/packages/rstan/index.html) inside this project's `docker` container. For more information on `Stan`, please visit [this page](https://mc-stan.org/). 
+
+## Example 
+
+### Library
+
+```{r library}
+library(rstan)
+```
+
+### Data 
+```{r data}
+source(file = "rats-data.R")
+rats_data
+```
+
+### Model Definition 
+
+The following model definition is taken from [`rstan` Getting Started Guide](https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started). 
+
+```{r model}
+# model definition
+rats_model_file <- 
+    "https://raw.githubusercontent.com/stan-dev/example-models/master/bugs_examples/vol1/rats/rats.stan"
+readLines(rats_model_file)
+```
+
+### Model Run
+
+```{r run}
+rats_fit <- stan(
+    file = rats_model_file, 
+    data = list(
+        "x" = as.numeric(rats_data[["x"]]), 
+        "xbar" = as.numeric(rats_data[["xbar"]]), 
+        "N" = as.integer(rats_data[["N"]]), 
+        "T" = as.integer(rats_data[["T"]]), 
+        "y" = as.matrix(rats_data[["Y"]])
+    )
+)
+```
+
+```{r summary}
+print(rats_fit)
+plot(rats_fit)
+```
+
+## Session Info
+
+```{r session}
+utils::sessionInfo()
+```
+

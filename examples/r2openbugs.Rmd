@@ -1,0 +1,113 @@
+---
+title: 'OpenBUGS in R'
+date: 'Rendered: `r format(Sys.time(), "%b %d, %Y")`'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## OpenBUGS 
+
+This is an example of running [`R2OpenBUGS`](https://cran.r-project.org/web/packages/R2OpenBUGS/index.html) inside this project's `docker` container. For more information on `Bayesian inference Using Gibbs Sampling (BUGS)`, please visit [this page](http://www.openbugs.net/w/FrontPage). 
+
+## Example 
+
+### Library
+
+```{r library}
+library(R2OpenBUGS)
+```
+
+### Data 
+```{r data}
+source(file = "rats-data.R")
+rats_data
+```
+
+### Model Definition 
+
+The following model definition is taken from [`OpenBUGS` tutorial](http://www.openbugs.net/Examples/Rats.html). 
+
+```{r model}
+# define model in strings 
+rats_model <- function() {
+    # likelihood 
+    for( i in 1 : N ) {
+        for( j in 1 : T ) {
+            Y[i , j] ~ dnorm(mu[i , j],tau.c)
+            mu[i , j] <- alpha[i] + beta[i] * (x[j] - xbar)
+            # deleted unnecessary lines
+        }
+        alpha[i] ~ dnorm(alpha.c,alpha.tau)
+        beta[i] ~ dnorm(beta.c,beta.tau)
+    }
+    
+    # prior 
+    tau.c ~ dgamma(0.001,0.001)
+    sigma <- 1 / sqrt(tau.c)
+    alpha.c ~ dnorm(0.0,1.0E-6)   
+    alpha.tau ~ dgamma(0.001,0.001)
+    beta.c ~ dnorm(0.0,1.0E-6)
+    beta.tau ~ dgamma(0.001,0.001)
+    alpha0 <- alpha.c - xbar * beta.c 
+}
+
+# write model to disk 
+# model.file must be renamed with .txt rather than .bug
+rats_model_file <- tempfile(pattern = "model_", fileext = ".txt") 
+write.model(rats_model, con = rats_model_file)
+
+# print file 
+readLines(rats_model_file)
+```
+
+### Model Run
+
+```{r run}
+rats_fit <- bugs(
+    data = rats_data,
+    inits = list(
+        # source: http://www.openbugs.net/Examples/Ratsinits.html
+        list(
+            "alpha" = rep(250, times = rats_data[["N"]]),
+            "beta"  = rep(6, times = rats_data[["N"]]),
+            "alpha.c" = 150,
+            "beta.c"  = 10,
+            "tau.c"   = 1,
+            "alpha.tau" = 1,
+            "beta.tau"  = 1
+        )
+    ),
+    model.file = rats_model_file, 
+    parameters.to.save = c("alpha0", "beta.c", "sigma"), 
+    # MCMC parameters to be consistent with
+    # http://www.openbugs.net/Examples/Rats.html
+    n.chains = 1,
+    n.burnin = 1000,
+    n.iter = 1000 + 10000, 
+    # other params 
+    digits = 9, 
+    bugs.seed = sample(x = seq_len(14), size = 1) # getting some randomness 
+)
+```
+
+```{r summary}
+print(rats_fit)
+```
+
+Comparing to the [results from OpenBUGS tutorial](http://www.openbugs.net/Examples/Rats.html): 
+
+```{r web_result, echo=FALSE, fig.align="center"}
+knitr::include_graphics("http://www.openbugs.net/Examples/rats3.bmp")
+```
+
+Note that the model did not specify constraints on `alpha` and `beta`'s hence creating *identifiability* issues. 
+
+## Session Info
+
+```{r session}
+utils::sessionInfo()
+```
+

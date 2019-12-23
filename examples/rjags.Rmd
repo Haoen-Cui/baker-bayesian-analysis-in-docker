@@ -1,0 +1,93 @@
+---
+title: 'JAGS in R'
+date: 'Rendered: `r format(Sys.time(), "%b %d, %Y")`'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## JAGS 
+
+This is an example of running [`rjags`](https://cran.r-project.org/web/packages/rjags/index.html) inside this project's `docker` container. For more information on `Just Another Gibbs Sampler (JAGS)`, please visit [this page](http://mcmc-jags.sourceforge.net/). 
+
+## Example 
+
+### Library
+
+```{r library}
+library(rjags)
+```
+
+### Data 
+```{r data}
+source(file = "rats-data.R")
+rats_data
+```
+
+### Model Definition 
+
+The following model definition is taken from [this document](https://people.maths.bris.ac.uk/~mazjcr/BMB/2016/JAGS_for_Rats.pdf). 
+
+```{r model}
+# define model in strings 
+rats_model_str <- "model {
+    # likelihood
+    for (i in 1:n) {
+        for (j in 1:k) {
+            Y[i, j] ~ dnorm(alpha + beta[i] * (x[j] - mean(x)), tauy)
+        }
+        beta[i] ~ dnorm(mub, taub)
+    }
+    
+    ## flat prior for (alpha, tauy, mub, taub)
+    alpha ~ dnorm(0, 0.000001)
+    tauy  ~ dgamma(0.001, 0.001)
+    mub   ~ dnorm(0, 0.000001)
+    taub  ~ dgamma(0.001, 0.001)
+}
+" 
+
+# write model to disk 
+rats_model_file <- tempfile(pattern = "model_", fileext = ".bug") 
+cat(rats_model_str, file = rats_model_file)
+
+# print file 
+readLines(rats_model_file)
+```
+
+### Model Run
+
+```{r compile}
+rats_model <- jags.model(
+    file = rats_model_file, 
+    data = list(
+        "n" = as.integer(rats_data[["N"]]), 
+        "k" = as.integer(rats_data[["T"]]), 
+        "x" = as.numeric(rats_data[["x"]]), 
+        "Y" = as.matrix(rats_data[["Y"]])
+    )
+)
+```
+
+```{r run}
+N_ITER <- 10000 
+rats_sample <- coda.samples(
+    model = rats_model, 
+    variable.names = c("beta"), 
+    n.iter = N_ITER, 
+    progress.bar = "none"
+)
+```
+
+```{r summary}
+summary(rats_sample)
+```
+
+## Session Info
+
+```{r session}
+utils::sessionInfo()
+```
+

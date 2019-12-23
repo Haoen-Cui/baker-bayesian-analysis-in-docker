@@ -1,0 +1,46 @@
+name: "Baker Project"
+description: "Baker Project - Dockerfile for Bayesian Analysis"
+base_url: https://haoen-cui.github.io/baker-bayesian-analysis-in-docker
+repository_url: https://github.com/Haoen-Cui/baker-bayesian-analysis-in-docker
+creative_commons: CC BY
+license_url: https://raw.githubusercontent.com/Haoen-Cui/baker-bayesian-analysis-in-docker/master/LICENSE
+# output_dir: "."
+output:
+  html_document:
+    theme: cosmo
+    highlight: pygments
+    toc: true
+    toc_float: true
+    toc_depth: 3
+    include:
+      after_body: layouts/footer.html
+    # css: layouts/styles.css
+navbar:
+  # logo:
+  #   images: static/images/logo.png
+  #   href: https://haoen-cui.github.io/baker-bayesian-analysis-in-docker
+  title: "Baker Project"
+  left:
+    - text: "Home"
+      icon: fa-home
+      href: index.html
+    - text: "PyMC3"
+      # icon: fab fa-python
+      href: pymc3.html
+    - text: "Stan"
+      # icon: fab fa-r-project
+      href: rstan.html
+    - text: "JAGS"
+      # icon: fab fa-r-project
+      href: rjags.html
+    - text: "BUGS"
+      # icon: fab fa-r-project
+      href: r2openbugs.html
+    - text: "Debug"
+      icon: fa-bug
+      href: tips.html
+  right:
+    - icon: fa-github fa-lg
+      href: https://github.com/Haoen-Cui/baker-bayesian-analysis-in-docker
+    - icon: fa-linkedin fa-lg
+      href: https://www.linkedin.com/in/haoencui/

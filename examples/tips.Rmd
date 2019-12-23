@@ -1,0 +1,28 @@
+---
+title: 'Tips for Debugging'
+date: 'Rendered: `r format(Sys.time(), "%b %d, %Y")`'
+output: html_document
+---
+
+Generally speaking, the first step of debugging errors is to read log file or console output since most packages in this project actually relies on other programs. For example, 
+
+- `rstan` runs `Stan` 
+- `rjags` runs `JAGS` 
+- `R2OpenBUGS` runs `OpenBUGS` which is the open-source version of `BUGS` 
+
+`stan` has very extensive [documentation](https://mc-stan.org/users/documentation/) and `JAGS` also have many active users in the academia. On the other hand, `BUGS` is, in my opinion, a little stale and not actively maintained with the community. My resolution to `BUGS` related questions is usually tribal knowledge of professors and TAs. 
+
+Below, I document some specific questions that I've seen. Please [contribute](https://github.com/Haoen-Cui/baker-bayesian-analysis-in-docker/issues) to this doc so that others can be benefited as well. 
+
+## `rstan` and `Stan`
+
+## `rjags` and `JAGS`
+
+## `R2OpenBUGS` and `OpenBUGS`
+
+The following sources are very helpful: 
+
+- [`BUGS` functions and distributions](http://www.mas.ncl.ac.uk/~nmf16/teaching/mas8303/functions.pdf) 
+- [Tips and Troubleshooting](http://www.openbugs.net/Manuals/TipsTroubleshooting.html) 
+- [Common Error Messages](http://statisticalestimation.blogspot.com/2014/06/common-error-messages-in-bugs-and-their.html) 
+

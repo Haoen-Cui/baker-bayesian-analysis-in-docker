@@ -1,0 +1,30 @@
+language: minimal
+
+# only clone most recent commit
+git:
+  depth: 1
+
+branches:
+  only:
+    - master
+
+# docker
+services:
+  - docker
+
+# build docker file
+before_script:
+  - docker pull haoencui/baker
+
+# build examples website 
+script:
+  - bash scripts/render-site/travis-script.sh
+
+# deploy to gh-pages branch
+deploy:
+  provider: pages
+  skip_cleanup: true
+  github_token: $GITHUB_PAT
+  on:
+    branch: master
+  local_dir: examples/_site
