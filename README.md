@@ -25,7 +25,7 @@ I was first introduced to `WinBUGS` in an undergraduate Bayesian analysis course
 
 ## Usage 
 
-Some basic (*very little*) general knowledge of `Docker` is needed. If one is interested in learning more, this [tutorial](https://docker-curriculum.com/) is a great source. We will present below a few common use cases. 
+Some basic (*very little*) general knowledge of [`Docker`](https://docs.docker.com/) is needed. If one is interested in learning more, this [tutorial](https://docker-curriculum.com/) is a great source. We will present below a few common use cases. 
 
 The `Dockerfile` of this project is based on `rocker/verse:latest`, therefore sharing many similar usage. For example, to set up a `rstudio server` on local host, run 
 ```bash
