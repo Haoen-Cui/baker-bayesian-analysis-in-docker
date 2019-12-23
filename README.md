@@ -2,10 +2,10 @@
 
 This project is named [`Baker`](https://haoen-cui.github.io/baker-bayesian-analysis-in-docker) because it provides a `Doc`**`ker`** image for **Ba**yesian analysis. In particular, it enables  
 
-- `PyMC3` with `Jupyter` and `miniconda3` 
-- `Stan` using `R` through `rstan` and other related packages 
-- `BUGS` using `R2OpenBUGS`
-- `JAGS` using `rjags`
+- [`PyMC3`](https://docs.pymc.io/) with [`Jupyter`](https://jupyterlab.readthedocs.io/en/stable/) and [`miniconda3`](https://docs.conda.io/en/latest/miniconda.html) 
+- [`Stan`](https://mc-stan.org/) using `R` through [`rstan`](https://cran.r-project.org/web/packages/rstan/index.html) and other related packages 
+- [`BUGS`](https://www.mrc-bsu.cam.ac.uk/software/bugs/), in particular [`OpenBUGS`](http://www.openbugs.net/w/FrontPage), using [`R2OpenBUGS`](https://cran.r-project.org/web/packages/R2OpenBUGS/index.html)
+- [`JAGS`](http://mcmc-jags.sourceforge.net/) using [`rjags`](https://cran.r-project.org/web/packages/rjags/index.html)
 
 The website for this project is available at [here](https://haoen-cui.github.io/baker-bayesian-analysis-in-docker). The project's goal is to help 
 
