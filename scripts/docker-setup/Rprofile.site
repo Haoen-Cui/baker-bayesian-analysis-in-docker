@@ -1,0 +1,23 @@
+# Configure httr to perform out-of-band authentication if HTTR_LOCALHOST     
+# is not set since a redirect to localhost may not work depending upon     
+# where this Docker container is running.     
+if(is.na(Sys.getenv("HTTR_LOCALHOST", unset=NA))) {     
+  options(httr_oob_default = TRUE)     
+}
+
+# suggested by rstan 
+rstan::rstan_options(
+    auto_write = TRUE
+)
+
+options(
+    # suggested by rstan 
+    mc.cores = parallel::detectCores(), 
+    # default repo for downloading R pkg 
+    repos = c(
+        "CRAN" = "https://cran.rstudio.com/"
+    ), 
+    download.file.method = "libcurl", 
+    # allow servr to launch a daemonized server 
+    servr.daemon = TRUE 
+)
