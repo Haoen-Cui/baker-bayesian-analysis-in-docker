@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/Haoen-Cui/baker-bayesian-analysis-in-docker.svg?branch=master)](https://travis-ci.org/Haoen-Cui/baker-bayesian-analysis-in-docker)
+
 ## About
 
 This project is named [`Baker`](https://haoen-cui.github.io/baker-bayesian-analysis-in-docker) because it provides a `Doc`**`ker`** image for **Ba**yesian analysis. In particular, it enables  
