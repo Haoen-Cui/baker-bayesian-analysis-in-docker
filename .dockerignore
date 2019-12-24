@@ -2,4 +2,4 @@
 **
 
 # except for some setup needs
-!scripts/docker-steup/**
+!scripts/docker-setup

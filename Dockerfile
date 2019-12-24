@@ -51,7 +51,7 @@ RUN conda update --yes conda \
 WORKDIR /
 
 
-# ##### install rstan ############################################################
+##### install rstan ############################################################
 # install system dependencies for R packages 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends gfortran libudunits2-dev libgdal-dev \
@@ -64,7 +64,7 @@ RUN mkdir -p $HOME/.R/ \
     && echo "CC=clang" >> $HOME/.R/Makevars \
     && echo "CXXFLAGS=-O3 -mtune=native -march=native -fPIC -Wno-unused-variable -Wno-unused-function -Wno-unused-local-typedefs -Wno-ignored-attributes -Wno-deprecated-declarations" >> $HOME/.R/Makevars 
 
-# install rstan
+# install rstan and related packages 
 RUN install2.r --error --deps TRUE \
     inline \
     RcppEigen \
@@ -122,7 +122,8 @@ RUN rm openbugs_3.2.3.orig.tar.gz
 
 
 ##### user setup ###############################################################
-COPY scripts/docker-setup/Rprofile.site usr/local/lib/R/etc/Rprofile.site
+COPY ./scripts/docker-setup/Rprofile.site /usr/local/lib/R/etc/Rprofile.site
+
 
 ##### cleanup ##################################################################
 # clean up the tmp folder 
