@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Stan in R</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Baker Project</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-home"></span>
+     
+    Home
+  </a>
+</li>
+<li>
+  <a href="pymc3.html">PyMC3</a>
+</li>
+<li>
+  <a href="rstan.html">Stan</a>
+</li>
+<li>
+  <a href="rjags.html">JAGS</a>
+</li>
+<li>
+  <a href="r2openbugs.html">BUGS</a>
+</li>
+<li>
+  <a href="tips.html">
+    <span class="fa fa-bug"></span>
+     
+    Debug
+  </a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/Haoen-Cui/baker-bayesian-analysis-in-docker">
+    <span class="fa fa-github fa-lg"></span>
+     
+  </a>
+</li>
+<li>
+  <a href="https://www.linkedin.com/in/haoencui/">
+    <span class="fa fa-linkedin fa-lg"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Stan in R</h1>
+<h4 class="date">Rendered: Dec 31, 2019</h4>
+
+</div>
+
+
+<div id="stan" class="section level2">
+<h2>Stan</h2>
+<p>This is an example of running <a href="https://cran.r-project.org/web/packages/rstan/index.html"><code>rstan</code></a> inside this project’s <code>docker</code> container. For more information on <code>Stan</code>, please visit <a href="https://mc-stan.org/">this page</a>.</p>
+</div>
+<div id="example" class="section level2">
+<h2>Example</h2>
+<div id="library" class="section level3">
+<h3>Library</h3>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw">library</span>(rstan)</a></code></pre></div>
+<pre><code>## Loading required package: StanHeaders</code></pre>
+<pre><code>## Loading required package: ggplot2</code></pre>
+<pre><code>## rstan (Version 2.19.2, GitRev: 2e1f913d3ca3)</code></pre>
+<pre><code>## For execution on a local, multicore CPU with excess RAM we recommend calling
+## options(mc.cores = parallel::detectCores()).
+## To avoid recompilation of unchanged Stan programs, we recommend calling
+## rstan_options(auto_write = TRUE)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;rstan&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:coda&#39;:
+## 
+##     traceplot</code></pre>
+<pre><code>## The following object is masked from &#39;package:R2OpenBUGS&#39;:
+## 
+##     monitor</code></pre>
+</div>
+<div id="data" class="section level3">
+<h3>Data</h3>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="kw">source</span>(<span class="dt">file =</span> <span class="st">&quot;rats-data.R&quot;</span>)</a>
+<a class="sourceLine" id="cb9-2" data-line-number="2">rats_data</a></code></pre></div>
+<pre><code>## $x
+## [1]  8 15 22 29 36
+## 
+## $xbar
+## [1] 22
+## 
+## $N
+## [1] 30
+## 
+## $T
+## [1] 5
+## 
+## $Y
+##       [,1] [,2] [,3] [,4] [,5]
+##  [1,]  151  141  154  157  132
+##  [2,]  199  189  200  212  185
+##  [3,]  246  231  244  259  237
+##  [4,]  283  275  289  307  286
+##  [5,]  320  305  325  336  331
+##  [6,]  145  159  171  152  160
+##  [7,]  199  201  221  203  207
+##  [8,]  249  248  270  246  257
+##  [9,]  293  297  326  286  303
+## [10,]  354  338  358  321  345
+## [11,]  147  177  163  154  169
+## [12,]  214  236  216  205  216
+## [13,]  263  285  242  253  261
+## [14,]  312  350  281  298  295
+## [15,]  328  376  312  334  333
+## [16,]  155  134  160  139  157
+## [17,]  200  182  207  190  205
+## [18,]  237  220  248  225  248
+## [19,]  272  260  288  267  289
+## [20,]  297  296  324  302  316
+## [21,]  135  160  142  146  137
+## [22,]  188  208  187  191  180
+## [23,]  230  261  234  229  219
+## [24,]  280  313  280  272  258
+## [25,]  323  352  316  302  291
+## [26,]  159  143  156  157  153
+## [27,]  210  188  203  211  200
+## [28,]  252  220  243  250  244
+## [29,]  298  273  283  285  286
+## [30,]  331  314  317  323  324</code></pre>
+</div>
+<div id="model-definition" class="section level3">
+<h3>Model Definition</h3>
+<p>The following model definition is taken from <a href="https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started"><code>rstan</code> Getting Started Guide</a>.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1"><span class="co"># model definition</span></a>
+<a class="sourceLine" id="cb11-2" data-line-number="2">rats_model_file &lt;-<span class="st"> </span></a>
+<a class="sourceLine" id="cb11-3" data-line-number="3"><span class="st">    &quot;https://raw.githubusercontent.com/stan-dev/example-models/master/bugs_examples/vol1/rats/rats.stan&quot;</span></a>
+<a class="sourceLine" id="cb11-4" data-line-number="4"><span class="kw">readLines</span>(rats_model_file)</a></code></pre></div>
+<pre><code>##  [1] &quot;# http://www.mrc-bsu.cam.ac.uk/bugs/winbugs/Vol1.pdf&quot;               
+##  [2] &quot;# Page 3: Rats&quot;                                                     
+##  [3] &quot;data {&quot;                                                             
+##  [4] &quot;  int&lt;lower=0&gt; N;&quot;                                                  
+##  [5] &quot;  int&lt;lower=0&gt; T;&quot;                                                  
+##  [6] &quot;  real x[T];&quot;                                                       
+##  [7] &quot;  real y[N,T];&quot;                                                     
+##  [8] &quot;  real xbar;&quot;                                                       
+##  [9] &quot;}&quot;                                                                  
+## [10] &quot;parameters {&quot;                                                       
+## [11] &quot;  real alpha[N];&quot;                                                   
+## [12] &quot;  real beta[N];&quot;                                                    
+## [13] &quot;&quot;                                                                   
+## [14] &quot;  real mu_alpha;&quot;                                                   
+## [15] &quot;  real mu_beta;          // beta.c in original bugs model&quot;          
+## [16] &quot;&quot;                                                                   
+## [17] &quot;  real&lt;lower=0&gt; sigmasq_y;&quot;                                         
+## [18] &quot;  real&lt;lower=0&gt; sigmasq_alpha;&quot;                                     
+## [19] &quot;  real&lt;lower=0&gt; sigmasq_beta;&quot;                                      
+## [20] &quot;}&quot;                                                                  
+## [21] &quot;transformed parameters {&quot;                                           
+## [22] &quot;  real&lt;lower=0&gt; sigma_y;       // sigma in original bugs model&quot;     
+## [23] &quot;  real&lt;lower=0&gt; sigma_alpha;&quot;                                       
+## [24] &quot;  real&lt;lower=0&gt; sigma_beta;&quot;                                        
+## [25] &quot;&quot;                                                                   
+## [26] &quot;  sigma_y &lt;- sqrt(sigmasq_y);&quot;                                      
+## [27] &quot;  sigma_alpha &lt;- sqrt(sigmasq_alpha);&quot;                              
+## [28] &quot;  sigma_beta &lt;- sqrt(sigmasq_beta);&quot;                                
+## [29] &quot;}&quot;                                                                  
+## [30] &quot;model {&quot;                                                            
+## [31] &quot;  mu_alpha ~ normal(0, 100);&quot;                                       
+## [32] &quot;  mu_beta ~ normal(0, 100);&quot;                                        
+## [33] &quot;  sigmasq_y ~ inv_gamma(0.001, 0.001);&quot;                             
+## [34] &quot;  sigmasq_alpha ~ inv_gamma(0.001, 0.001);&quot;                         
+## [35] &quot;  sigmasq_beta ~ inv_gamma(0.001, 0.001);&quot;                          
+## [36] &quot;  alpha ~ normal(mu_alpha, sigma_alpha); // vectorized&quot;             
+## [37] &quot;  beta ~ normal(mu_beta, sigma_beta);  // vectorized&quot;               
+## [38] &quot;  for (n in 1:N)&quot;                                                   
+## [39] &quot;    for (t in 1:T) &quot;                                                
+## [40] &quot;      y[n,t] ~ normal(alpha[n] + beta[n] * (x[t] - xbar), sigma_y);&quot;
+## [41] &quot;&quot;                                                                   
+## [42] &quot;}&quot;                                                                  
+## [43] &quot;generated quantities {&quot;                                             
+## [44] &quot;  real alpha0;&quot;                                                     
+## [45] &quot;  alpha0 &lt;- mu_alpha - xbar * mu_beta;&quot;                             
+## [46] &quot;}&quot;</code></pre>
+</div>
+<div id="model-run" class="section level3">
+<h3>Model Run</h3>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1">rats_fit &lt;-<span class="st"> </span><span class="kw">stan</span>(</a>
+<a class="sourceLine" id="cb13-2" data-line-number="2">    <span class="dt">file =</span> rats_model_file, </a>
+<a class="sourceLine" id="cb13-3" data-line-number="3">    <span class="dt">data =</span> <span class="kw">list</span>(</a>
+<a class="sourceLine" id="cb13-4" data-line-number="4">        <span class="st">&quot;x&quot;</span> =<span class="st"> </span><span class="kw">as.numeric</span>(rats_data[[<span class="st">&quot;x&quot;</span>]]), </a>
+<a class="sourceLine" id="cb13-5" data-line-number="5">        <span class="st">&quot;xbar&quot;</span> =<span class="st"> </span><span class="kw">as.numeric</span>(rats_data[[<span class="st">&quot;xbar&quot;</span>]]), </a>
+<a class="sourceLine" id="cb13-6" data-line-number="6">        <span class="st">&quot;N&quot;</span> =<span class="st"> </span><span class="kw">as.integer</span>(rats_data[[<span class="st">&quot;N&quot;</span>]]), </a>
+<a class="sourceLine" id="cb13-7" data-line-number="7">        <span class="st">&quot;T&quot;</span> =<span class="st"> </span><span class="kw">as.integer</span>(rats_data[[<span class="st">&quot;T&quot;</span>]]), </a>
+<a class="sourceLine" id="cb13-8" data-line-number="8">        <span class="st">&quot;y&quot;</span> =<span class="st"> </span><span class="kw">as.matrix</span>(rats_data[[<span class="st">&quot;Y&quot;</span>]])</a>
+<a class="sourceLine" id="cb13-9" data-line-number="9">    )</a>
+<a class="sourceLine" id="cb13-10" data-line-number="10">)</a></code></pre></div>
+<pre><code>## Warning in normalizePath(file): path[1]=&quot;https://raw.githubusercontent.com/stan-
+## dev/example-models/master/bugs_examples/vol1/rats/rats.stan&quot;: No such file or
+## directory</code></pre>
+<pre><code>## DIAGNOSTIC(S) FROM PARSER:
+## Info: Comments beginning with # are deprecated.  Please use // in place of # for line comments.
+## Info: Comments beginning with # are deprecated.  Please use // in place of # for line comments.
+## Info: Comments beginning with # are deprecated.  Please use // in place of # for line comments.
+## Info: Comments beginning with # are deprecated.  Please use // in place of # for line comments.
+## Info: assignment operator &lt;- deprecated in the Stan language; use = instead.
+## Info: assignment operator &lt;- deprecated in the Stan language; use = instead.
+## Info: assignment operator &lt;- deprecated in the Stan language; use = instead.
+## Info: assignment operator &lt;- deprecated in the Stan language; use = instead.</code></pre>
+<pre><code>## Warning: There were 47 divergent transitions after warmup. Increasing adapt_delta above 0.8 may help. See
+## http://mc-stan.org/misc/warnings.html#divergent-transitions-after-warmup</code></pre>
+<pre><code>## Warning: There were 3 chains where the estimated Bayesian Fraction of Missing Information was low. See
+## http://mc-stan.org/misc/warnings.html#bfmi-low</code></pre>
+<pre><code>## Warning: Examine the pairs() plot to diagnose sampling problems</code></pre>
+<pre><code>## Warning: Bulk Effective Samples Size (ESS) is too low, indicating posterior means and medians may be unreliable.
+## Running the chains for more iterations may help. See
+## http://mc-stan.org/misc/warnings.html#bulk-ess</code></pre>
+<pre><code>## Warning: Tail Effective Samples Size (ESS) is too low, indicating posterior variances and tail quantiles may be unreliable.
+## Running the chains for more iterations may help. See
+## http://mc-stan.org/misc/warnings.html#tail-ess</code></pre>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" data-line-number="1"><span class="kw">print</span>(rats_fit)</a></code></pre></div>
+<pre><code>## Inference for Stan model: rats.
+## 4 chains, each with iter=2000; warmup=1000; thin=1; 
+## post-warmup draws per chain=1000, total post-warmup draws=4000.
+## 
+##                  mean se_mean      sd    2.5%     25%     50%     75%   97.5%
+## alpha[1]       147.93    0.09    5.99  136.49  143.99  147.90  151.82  159.97
+## alpha[2]       197.40    0.10    6.22  185.36  193.10  197.45  201.58  209.97
+## alpha[3]       243.45    0.09    6.34  231.04  239.11  243.43  247.70  255.98
+## alpha[4]       287.60    0.09    6.30  275.11  283.46  287.61  291.72  300.03
+## alpha[5]       322.66    0.10    6.16  310.40  318.52  322.67  326.75  334.82
+## alpha[6]       158.10    0.09    6.16  146.31  153.96  158.02  162.17  170.66
+## alpha[7]       206.60    0.09    6.14  194.34  202.55  206.67  210.76  218.35
+## alpha[8]       253.90    0.10    6.22  241.97  249.75  253.75  258.09  266.24
+## alpha[9]       300.53    0.09    6.19  288.29  296.26  300.57  304.88  312.44
+## alpha[10]      342.38    0.11    6.03  330.39  338.44  342.25  346.46  354.11
+## alpha[11]      162.74    0.09    6.08  150.71  158.69  162.81  166.77  174.95
+## alpha[12]      217.54    0.09    6.07  205.90  213.48  217.42  221.64  229.95
+## alpha[13]      260.52    0.09    6.06  248.73  256.46  260.58  264.49  272.47
+## alpha[14]      306.50    0.09    6.13  294.38  302.48  306.58  310.45  318.40
+## alpha[15]      335.73    0.10    6.21  323.22  331.65  335.65  339.89  347.72
+## alpha[16]      149.83    0.09    6.15  137.70  145.82  149.86  154.05  161.88
+## alpha[17]      197.08    0.10    6.20  185.08  192.83  197.10  201.36  209.03
+## alpha[18]      235.70    0.09    6.19  223.06  231.64  235.70  239.84  247.75
+## alpha[19]      274.85    0.12    6.11  262.81  270.68  274.89  279.05  286.56
+## alpha[20]      306.21    0.09    6.32  293.75  301.99  306.07  310.50  319.02
+## alpha[21]      144.93    0.08    6.17  133.13  140.58  144.85  149.20  156.97
+## alpha[22]      191.22    0.09    5.99  179.60  187.12  191.08  195.32  203.22
+## alpha[23]      234.48    0.09    6.32  222.64  230.11  234.48  238.83  246.45
+## alpha[24]      280.21    0.10    6.14  268.32  276.03  280.17  284.33  292.29
+## alpha[25]      316.12    0.09    6.14  304.20  312.10  316.09  320.04  328.33
+## alpha[26]      154.45    0.11    6.27  142.07  150.25  154.37  158.65  167.21
+## alpha[27]      202.81    0.09    6.13  190.81  198.48  202.78  206.86  215.10
+## alpha[28]      241.78    0.09    6.14  229.10  237.61  241.85  245.98  253.43
+## alpha[29]      284.44    0.08    6.13  272.47  280.42  284.49  288.55  296.14
+## alpha[30]      321.17    0.12    6.30  309.15  316.96  321.07  325.29  333.74
+## beta[1]         -0.12    0.01    0.20   -0.52   -0.23   -0.11    0.00    0.27
+## beta[2]         -0.10    0.00    0.19   -0.48   -0.21   -0.10    0.02    0.31
+## beta[3]         -0.08    0.01    0.20   -0.47   -0.20   -0.09    0.03    0.33
+## beta[4]         -0.05    0.01    0.21   -0.42   -0.18   -0.07    0.05    0.41
+## beta[5]         -0.04    0.01    0.21   -0.41   -0.17   -0.05    0.07    0.45
+## beta[6]         -0.07    0.01    0.19   -0.43   -0.19   -0.08    0.04    0.35
+## beta[7]         -0.07    0.01    0.19   -0.44   -0.19   -0.08    0.03    0.36
+## beta[8]         -0.08    0.01    0.20   -0.45   -0.20   -0.08    0.03    0.36
+## beta[9]         -0.08    0.01    0.19   -0.46   -0.19   -0.08    0.03    0.32
+## beta[10]        -0.13    0.01    0.20   -0.57   -0.24   -0.12   -0.01    0.24
+## beta[11]        -0.07    0.01    0.20   -0.45   -0.19   -0.08    0.04    0.37
+## beta[12]        -0.12    0.01    0.20   -0.56   -0.23   -0.11    0.00    0.28
+## beta[13]        -0.13    0.01    0.20   -0.55   -0.24   -0.12   -0.01    0.25
+## beta[14]        -0.18    0.01    0.22   -0.71   -0.28   -0.15   -0.04    0.18
+## beta[15]        -0.12    0.01    0.19   -0.52   -0.23   -0.12    0.00    0.25
+## beta[16]        -0.09    0.01    0.19   -0.46   -0.20   -0.09    0.03    0.32
+## beta[17]        -0.07    0.01    0.20   -0.45   -0.19   -0.08    0.04    0.34
+## beta[18]        -0.07    0.01    0.20   -0.44   -0.19   -0.08    0.04    0.35
+## beta[19]        -0.05    0.01    0.21   -0.41   -0.17   -0.07    0.06    0.41
+## beta[20]        -0.04    0.01    0.21   -0.41   -0.17   -0.06    0.06    0.46
+## beta[21]        -0.10    0.01    0.19   -0.47   -0.21   -0.10    0.01    0.30
+## beta[22]        -0.12    0.01    0.20   -0.57   -0.23   -0.12    0.00    0.25
+## beta[23]        -0.14    0.01    0.20   -0.58   -0.25   -0.13   -0.02    0.21
+## beta[24]        -0.18    0.01    0.21   -0.65   -0.29   -0.16   -0.04    0.19
+## beta[25]        -0.20    0.01    0.23   -0.76   -0.32   -0.17   -0.06    0.15
+## beta[26]        -0.09    0.01    0.19   -0.49   -0.20   -0.09    0.02    0.31
+## beta[27]        -0.09    0.01    0.19   -0.47   -0.20   -0.10    0.02    0.32
+## beta[28]        -0.08    0.01    0.21   -0.47   -0.20   -0.09    0.03    0.35
+## beta[29]        -0.10    0.01    0.20   -0.51   -0.22   -0.11    0.01    0.33
+## beta[30]        -0.10    0.01    0.20   -0.50   -0.21   -0.10    0.02    0.31
+## mu_alpha       239.36    0.17   11.64  215.20  232.01  239.24  246.86  262.85
+## mu_beta         -0.10    0.00    0.12   -0.32   -0.18   -0.10   -0.02    0.13
+## sigmasq_y      189.81    0.48   24.72  149.09  172.14  187.18  204.71  243.22
+## sigmasq_alpha 4223.44   19.95 1206.89 2512.74 3369.43 4029.62 4843.19 7204.92
+## sigmasq_beta     0.03    0.00    0.04    0.00    0.01    0.02    0.04    0.16
+## sigma_y         13.75    0.02    0.89   12.21   13.12   13.68   14.31   15.60
+## sigma_alpha     64.38    0.14    8.86   50.13   58.05   63.48   69.59   84.88
+## sigma_beta       0.15    0.01    0.10    0.03    0.08    0.13    0.20    0.40
+## alpha0         241.52    0.22   11.98  217.25  233.69  241.38  249.51  265.64
+## lp__          -562.50    2.16   19.79 -597.70 -577.23 -563.88 -548.40 -522.88
+##               n_eff Rhat
+## alpha[1]       4137 1.00
+## alpha[2]       4137 1.00
+## alpha[3]       4642 1.00
+## alpha[4]       5113 1.00
+## alpha[5]       3645 1.00
+## alpha[6]       4215 1.00
+## alpha[7]       4556 1.00
+## alpha[8]       4149 1.00
+## alpha[9]       4584 1.00
+## alpha[10]      3045 1.00
+## alpha[11]      4353 1.00
+## alpha[12]      4546 1.00
+## alpha[13]      4090 1.00
+## alpha[14]      4275 1.00
+## alpha[15]      3582 1.00
+## alpha[16]      4687 1.00
+## alpha[17]      4082 1.00
+## alpha[18]      4349 1.00
+## alpha[19]      2647 1.00
+## alpha[20]      4484 1.00
+## alpha[21]      5718 1.00
+## alpha[22]      4525 1.00
+## alpha[23]      4480 1.00
+## alpha[24]      3510 1.00
+## alpha[25]      4663 1.00
+## alpha[26]      3131 1.00
+## alpha[27]      4424 1.00
+## alpha[28]      5186 1.00
+## alpha[29]      5251 1.00
+## alpha[30]      2916 1.00
+## beta[1]        1253 1.00
+## beta[2]        1496 1.00
+## beta[3]        1350 1.00
+## beta[4]         826 1.01
+## beta[5]         870 1.00
+## beta[6]        1123 1.00
+## beta[7]        1201 1.00
+## beta[8]        1101 1.00
+## beta[9]        1238 1.00
+## beta[10]       1138 1.00
+## beta[11]       1056 1.00
+## beta[12]       1586 1.00
+## beta[13]       1291 1.00
+## beta[14]        775 1.00
+## beta[15]       1280 1.00
+## beta[16]       1049 1.01
+## beta[17]       1132 1.00
+## beta[18]       1209 1.00
+## beta[19]        764 1.01
+## beta[20]        699 1.01
+## beta[21]       1308 1.00
+## beta[22]       1219 1.00
+## beta[23]       1064 1.00
+## beta[24]        613 1.00
+## beta[25]        497 1.00
+## beta[26]       1270 1.00
+## beta[27]       1359 1.00
+## beta[28]       1254 1.00
+## beta[29]       1444 1.00
+## beta[30]       1320 1.00
+## mu_alpha       4566 1.00
+## mu_beta         552 1.01
+## sigmasq_y      2610 1.00
+## sigmasq_alpha  3660 1.00
+## sigmasq_beta    168 1.01
+## sigma_y        2618 1.00
+## sigma_alpha    3856 1.00
+## sigma_beta      116 1.02
+## alpha0         3065 1.00
+## lp__             84 1.04
+## 
+## Samples were drawn using NUTS(diag_e) at Tue Dec 31 10:47:55 2019.
+## For each parameter, n_eff is a crude measure of effective sample size,
+## and Rhat is the potential scale reduction factor on split chains (at 
+## convergence, Rhat=1).</code></pre>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb23-1" data-line-number="1"><span class="kw">plot</span>(rats_fit)</a></code></pre></div>
+<pre><code>## &#39;pars&#39; not specified. Showing first 10 parameters by default.</code></pre>
+<pre><code>## ci_level: 0.8 (80% intervals)</code></pre>
+<pre><code>## outer_level: 0.95 (95% intervals)</code></pre>
+<p><img src="rstan_files/figure-html/summary-1.png" width="672" /></p>
+</div>
+</div>
+<div id="session-info" class="section level2">
+<h2>Session Info</h2>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb27-1" data-line-number="1">utils<span class="op">::</span><span class="kw">sessionInfo</span>()</a></code></pre></div>
+<pre><code>## R version 3.6.2 (2019-12-12)
+## Platform: x86_64-pc-linux-gnu (64-bit)
+## Running under: Debian GNU/Linux 10 (buster)
+## 
+## Matrix products: default
+## BLAS/LAPACK: /usr/lib/x86_64-linux-gnu/libopenblasp-r0.3.5.so
+## 
+## locale:
+##  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+##  [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+##  [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=C             
+##  [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+##  [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+## [11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+## 
+## attached base packages:
+## [1] stats     graphics  grDevices utils     datasets  methods   base     
+## 
+## other attached packages:
+## [1] rstan_2.19.2       ggplot2_3.2.1      StanHeaders_2.19.0 rjags_4-10        
+## [5] coda_0.19-3        R2OpenBUGS_3.2-3.2
+## 
+## loaded via a namespace (and not attached):
+##  [1] Rcpp_1.0.3         pillar_1.4.3       compiler_3.6.2     prettyunits_1.0.2 
+##  [5] tools_3.6.2        boot_1.3-23        digest_0.6.23      pkgbuild_1.0.6    
+##  [9] lattice_0.20-38    evaluate_0.14      lifecycle_0.1.0    tibble_2.1.3      
+## [13] gtable_0.3.0       pkgconfig_2.0.3    rlang_0.4.2        cli_2.0.0         
+## [17] yaml_2.2.0         parallel_3.6.2     xfun_0.11          loo_2.2.0         
+## [21] gridExtra_2.3      withr_2.1.2        stringr_1.4.0      knitr_1.26        
+## [25] dplyr_0.8.3        stats4_3.6.2       grid_3.6.2         tidyselect_0.2.5  
+## [29] glue_1.3.1         inline_0.3.15      R6_2.4.1           processx_3.4.1    
+## [33] fansi_0.4.0        rmarkdown_2.0      farver_2.0.1       callr_3.4.0       
+## [37] purrr_0.3.3        magrittr_1.5       codetools_0.2-16   htmltools_0.4.0   
+## [41] scales_1.1.0       ps_1.3.0           matrixStats_0.55.0 assertthat_0.2.1  
+## [45] colorspace_1.4-1   labeling_0.3       stringi_1.4.3      lazyeval_0.2.2    
+## [49] munsell_0.5.0      crayon_1.3.4</code></pre>
+</div>
+
+<hr>
+<div id="footer">
+<p>Copyright &copy; 2020 Haoen Cui. All rights reserved.</p>
+</div>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
